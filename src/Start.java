@@ -29,10 +29,19 @@ public class Start {
 		    			table[i][j] = (int)(Math.random()*5) +1;
 				}
 			}
+			findEmptyByUser();
 		}
-		
 		System.out.println(Arrays.toString(table[0]));
-		calculateMeasuresForUsers(k,0);
+	}
+	
+	public void findEmptyByUser() {
+		for(int i=0 ;i<table.length;i++) {
+			for(int j = 0; j < table[i].length; j++) {
+				if(table[i][j]==0) {
+					calculateMeasuresForUsers(k,i);
+				}
+			}
+		}
 	}
 	
 	public void Export(String name) {
@@ -98,8 +107,8 @@ public class Start {
 			}
 		}
 		//compare by the first column (jaccard)
-		Arrays.sort(measures, (a, b) -> Double.compare(a[1], b[1]));
-		ExportMeasures("jaccard.txt",measures);
+		Arrays.sort(measures, (a, b) -> Double.compare(b[1], a[1]));
+		ExportMeasures("jaccard_users.txt",measures);
 		for(int j=measures.length-1;j>measures.length-1-k;j--) {
 			neighbors.add((int) measures[j][0]);
 		}
@@ -107,8 +116,8 @@ public class Start {
 		neighbors.clear();
 		
 		//compare by the seconds column (cosine)
-		Arrays.sort(measures, (a, b) -> Double.compare(a[2], b[2]));
-		ExportMeasures("cosine.txt",measures);
+		Arrays.sort(measures, (a, b) -> Double.compare(b[2], a[2]));
+		ExportMeasures("cosine_users.txt",measures);
 		for(int j=measures.length-1;j>measures.length-1-k;j--) {
 			neighbors.add((int) measures[j][0]);
 		}
@@ -116,8 +125,8 @@ public class Start {
 		neighbors.clear();
 		
 		//compare by the third column (pearson)
-		Arrays.sort(measures, (a, b) -> Double.compare(a[3], b[3]));
-		ExportMeasures("pearson.txt",measures);
+		Arrays.sort(measures, (a, b) -> Double.compare(b[3], a[3]));
+		ExportMeasures("pearson_users.txt",measures);
 		for(int j=measures.length-1;j>measures.length-1-k;j--) {
 			neighbors.add((int) measures[j][0]);
 		}
@@ -140,8 +149,8 @@ public class Start {
 			}
 		}
 		//compare by the first column (jaccard)
-		Arrays.sort(measures, (a, b) -> Double.compare(a[1], b[1]));
-		ExportMeasures("jaccard.txt",measures);
+		Arrays.sort(measures, (a, b) -> Double.compare(b[1], a[1]));
+		ExportMeasures("jaccard_items.txt",measures);
 		for(int j=measures.length-1;j>measures.length-1-k;j--) {
 			neighbors.add((int) measures[j][0]);
 		}
@@ -149,8 +158,8 @@ public class Start {
 		neighbors.clear();
 		
 		//compare by the seconds column (cosine)
-		Arrays.sort(measures, (a, b) -> Double.compare(a[2], b[2]));
-		ExportMeasures("cosine.txt",measures);
+		Arrays.sort(measures, (a, b) -> Double.compare(b[2], a[2]));
+		ExportMeasures("cosine_item.txt",measures);
 		for(int j=measures.length-1;j>measures.length-1-k;j--) {
 			neighbors.add((int) measures[j][0]);
 		}
@@ -158,8 +167,8 @@ public class Start {
 		neighbors.clear();
 		
 		//compare by the third column (pearson)
-		Arrays.sort(measures, (a, b) -> Double.compare(a[3], b[3]));
-		ExportMeasures("pearson.txt",measures);
+		Arrays.sort(measures, (a, b) -> Double.compare(a[3], a[3]));
+		ExportMeasures("pearson_items.txt",measures);
 		for(int j=measures.length-1;j>measures.length-1-k;j--) {
 			neighbors.add((int) measures[j][0]);
 		}
