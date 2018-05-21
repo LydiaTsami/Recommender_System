@@ -32,7 +32,7 @@ public class Start {
 		}
 		
 		System.out.println(Arrays.toString(table[0]));
-		calculateMeasures(k,0);
+		calculateMeasuresForUsers(k,0);
 	}
 	
 	public void Export(String name) {
@@ -83,12 +83,12 @@ public class Start {
 		}
 	}
 	
-	public void calculateMeasures(int k,int user) {
+	public void calculateMeasuresForUsers(int k,int user) {
 		double[][] measures = new double[n][4];
 		ArrayList<Integer> neighbors = new ArrayList<Integer>();
 		for(int i=0;i<table.length;i++) {
 			if(i!=user) {
-				double jaccard = new Jaccard(table[user],table[i]).calculateJaccard();
+				double jaccard = new Jaccard(table[user],table[i]).calculateJaccardUser();
 				double cosine = new Cosine(table[user],table[i]).CalculateCosineSimilarity();
 				double pearson = new PearsonCorrelation(table[user],table[i]).CalculateCorrelation();
 				measures[i][0] = i;
@@ -109,6 +109,11 @@ public class Start {
 		//compare by the seconds column (cosine)
 		Arrays.sort(measures, (a, b) -> Double.compare(a[2], b[2]));
 		ExportMeasures("cosine.txt",measures);
+		for(int j=measures.length-1;j>measures.length-1-k;j--) {
+			neighbors.add((int) measures[j][0]);
+		}
+		System.out.println(neighbors);
+		neighbors.clear();
 		
 		//compare by the third column (pearson)
 		Arrays.sort(measures, (a, b) -> Double.compare(a[3], b[3]));
@@ -119,5 +124,54 @@ public class Start {
 		System.out.println(neighbors);
 	}
 	
+	public void calculateMeasuresForItems(int k,int item) {
+		double[][] measures = new double[n][4];
+		int[][] transpose = transposeMatrix(table);
+		ArrayList<Integer> neighbors = new ArrayList<Integer>();
+		for(int i=0;i<table.length;i++) {
+			if(i!=item) {
+				double jaccard = new Jaccard(transpose[item],transpose[i]).calculateJaccardUser();
+				double cosine = new Cosine(transpose[item],transpose[i]).CalculateCosineSimilarity();
+				double pearson = new PearsonCorrelation(transpose[item],transpose[i]).CalculateCorrelation();
+				measures[i][0] = i;
+				measures[i][1] = jaccard;
+				measures[i][2] = cosine;
+				measures[i][3] = pearson;
+			}
+		}
+		//compare by the first column (jaccard)
+		Arrays.sort(measures, (a, b) -> Double.compare(a[1], b[1]));
+		ExportMeasures("jaccard.txt",measures);
+		for(int j=measures.length-1;j>measures.length-1-k;j--) {
+			neighbors.add((int) measures[j][0]);
+		}
+		System.out.println(neighbors);
+		neighbors.clear();
+		
+		//compare by the seconds column (cosine)
+		Arrays.sort(measures, (a, b) -> Double.compare(a[2], b[2]));
+		ExportMeasures("cosine.txt",measures);
+		for(int j=measures.length-1;j>measures.length-1-k;j--) {
+			neighbors.add((int) measures[j][0]);
+		}
+		System.out.println(neighbors);
+		neighbors.clear();
+		
+		//compare by the third column (pearson)
+		Arrays.sort(measures, (a, b) -> Double.compare(a[3], b[3]));
+		ExportMeasures("pearson.txt",measures);
+		for(int j=measures.length-1;j>measures.length-1-k;j--) {
+			neighbors.add((int) measures[j][0]);
+		}
+		System.out.println(neighbors);
+	}
+	
+	public static int[][] transposeMatrix(int [][] m){
+		int[][] temp = new int[m[0].length][m.length];
+        for (int i = 0; i < m.length; i++)
+            for (int j = 0; j < m[0].length; j++)
+                temp[j][i] = m[i][j];
+        return temp;
+    }
 	
 }

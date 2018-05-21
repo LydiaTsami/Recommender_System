@@ -38,7 +38,6 @@ public class PearsonCorrelation {
 
 	    // correlation is just a normalized covariation
 	    double pearson = cov / sigmax / sigmay;
-	    System.out.println("Pearson's Correlation: " +pearson);
 	    return pearson;
 	  }
 }

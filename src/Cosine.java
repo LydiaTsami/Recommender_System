@@ -25,7 +25,6 @@ public class Cosine {
 	      normB += Math.pow(vector2[i], 2);
 	    }
 	    double cosine = (dotProduct / (Math.sqrt(normA) * Math.sqrt(normB)))*100;
-	    System.out.println("Cosine similarity " +cosine);
 	    return cosine;
 	  }
 }
