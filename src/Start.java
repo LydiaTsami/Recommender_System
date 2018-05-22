@@ -3,6 +3,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Stack;
 
 public class Start {
 	private int t,m,n,x,k;
@@ -20,18 +22,28 @@ public class Start {
 	}
 	
 	public void Populate() {
-		for(int repetition=0; repetition<t;repetition++) {
+		//for(int repetition=0; repetition<t;repetition++) {
+			int number= n*m*x/100;
 			table = new int[n][m];
+			Stack<Integer> numbers = new Stack<Integer>();
+			System.out.println(number);
+		
+			for(int i=0;i<number;i++) {
+				numbers.push((int)(Math.random()*5) +1);
+			}
+			for(int i=number;i<n*m;i++) {
+				numbers.push(0);
+			}
+			Collections.shuffle(numbers);
+		
 			for (int i = 0; i < table.length; i++) {
 				for (int j = 0; j < table[i].length; j++) {
-					int random = (int)(Math.random()*99+1);
-		    		if(random<=x) 
-		    			table[i][j] = (int)(Math.random()*5) +1;
-				}
+					table[i][j]= numbers.pop();
+		    	}
 			}
 			findEmptyByUser();
-		}
-		System.out.println(Arrays.toString(table[0]));
+//			System.out.println(Arrays.toString(table[0]));
+//		}
 	}
 	
 	public void findEmptyByUser() {
@@ -39,6 +51,7 @@ public class Start {
 			for(int j = 0; j < table[i].length; j++) {
 				if(table[i][j]==0) {
 					calculateMeasuresForUsers(k,i);
+					break;
 				}
 			}
 		}
@@ -111,8 +124,7 @@ public class Start {
 		ExportMeasures("jaccard_users.txt",measures);
 		for(int j=measures.length-1;j>measures.length-1-k;j--) {
 			neighbors.add((int) measures[j][0]);
-		}
-		System.out.println(neighbors);
+		}	
 		neighbors.clear();
 		
 		//compare by the seconds column (cosine)
@@ -121,7 +133,6 @@ public class Start {
 		for(int j=measures.length-1;j>measures.length-1-k;j--) {
 			neighbors.add((int) measures[j][0]);
 		}
-		System.out.println(neighbors);
 		neighbors.clear();
 		
 		//compare by the third column (pearson)
@@ -130,7 +141,6 @@ public class Start {
 		for(int j=measures.length-1;j>measures.length-1-k;j--) {
 			neighbors.add((int) measures[j][0]);
 		}
-		System.out.println(neighbors);
 	}
 	
 	public void calculateMeasuresForItems(int k,int item) {
@@ -154,7 +164,6 @@ public class Start {
 		for(int j=measures.length-1;j>measures.length-1-k;j--) {
 			neighbors.add((int) measures[j][0]);
 		}
-		System.out.println(neighbors);
 		neighbors.clear();
 		
 		//compare by the seconds column (cosine)
@@ -163,7 +172,6 @@ public class Start {
 		for(int j=measures.length-1;j>measures.length-1-k;j--) {
 			neighbors.add((int) measures[j][0]);
 		}
-		System.out.println(neighbors);
 		neighbors.clear();
 		
 		//compare by the third column (pearson)
@@ -172,7 +180,6 @@ public class Start {
 		for(int j=measures.length-1;j>measures.length-1-k;j--) {
 			neighbors.add((int) measures[j][0]);
 		}
-		System.out.println(neighbors);
 	}
 	
 	public static int[][] transposeMatrix(int [][] m){
