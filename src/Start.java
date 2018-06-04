@@ -1,32 +1,30 @@
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Stack;
 
 public class Start {
-	private int t,m,n,x,k;
+	private int m,n,x,k;
 	int[][] table;
 	
 	
-	public Start(int users,int items,int perc,int k,int t) {
+	public Start(int users,int items,int perc,int k) {
 	this.n = users;
 	this.m = items;
 	this.x = perc;
 	this.k = k;
-	this.t = t;
-	Populate();
-	Export("table.txt");
 	}
 	
-	public void Populate() {
-		//for(int repetition=0; repetition<t;repetition++) {
+	public void Populate(int t) {
 			int number= n*m*x/100;
 			table = new int[n][m];
 			Stack<Integer> numbers = new Stack<Integer>();
-			System.out.println(number);
 		
 			for(int i=0;i<number;i++) {
 				numbers.push((int)(Math.random()*5) +1);
@@ -41,48 +39,14 @@ public class Start {
 					table[i][j]= numbers.pop();
 		    	}
 			}
-			findEmptyByUser();
-//			System.out.println(Arrays.toString(table[0]));
-//		}
+			String outputpath = "\\repetition" + (t+1);
+			Export(outputpath,table,"original_table.txt");
 	}
 	
-	public void findEmptyByUser() {
-		for(int i=0 ;i<table.length;i++) {
-			for(int j = 0; j < table[i].length; j++) {
-				if(table[i][j]==0) {
-					calculateMeasuresForUsers(k,i);
-					break;
-				}
-			}
-		}
-	}
-	
-	public void Export(String name) {
-		String output = System.getProperty("user.dir")+ "\\"+ name;
-		StringBuilder builder = new StringBuilder();
-		for(int i = 0; i < table.length; i++)//for each row
-		{
-		   for(int j = 0; j < table[i].length; j++)//for each column
-		   {
-		      builder.append(table[i][j]+"");//append to the output string
-		      if(j < table[i].length - 1 && i<table.length)//if this is not the last row element
-		         builder.append(" ");
-		   }
-		   builder.append("\n");//append new line at the end of the row
-		}
-		BufferedWriter writer;
-		try {
-			writer = new BufferedWriter(new FileWriter(output));
-			writer.write(builder.toString());//save the string representation of the board
-			writer.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public void ExportMeasures(String name,double[][] grid) {
-		String output = System.getProperty("user.dir")+ "\\"+ name;
+	public void Export(String path,int grid[][],String name) {
+		String output = System.getProperty("user.dir")+ "\\solutions"+ path;
+		new File(output).mkdirs();
+        output =output +  "\\" + name;
 		StringBuilder builder = new StringBuilder();
 		for(int i = 0; i < grid.length; i++)//for each row
 		{
@@ -105,81 +69,112 @@ public class Start {
 		}
 	}
 	
-	public void calculateMeasuresForUsers(int k,int user) {
-		double[][] measures = new double[n][4];
-		ArrayList<Integer> neighbors = new ArrayList<Integer>();
-		for(int i=0;i<table.length;i++) {
-			if(i!=user) {
-				double jaccard = new Jaccard(table[user],table[i]).calculateJaccardUser();
-				double cosine = new Cosine(table[user],table[i]).CalculateCosineSimilarity();
-				double pearson = new PearsonCorrelation(table[user],table[i]).CalculateCorrelation();
-				measures[i][0] = i;
-				measures[i][1] = jaccard;
-				measures[i][2] = cosine;
-				measures[i][3] = pearson;
-			}
+	public void ExportErrors(String path,double grid[],String name) {
+		String output = System.getProperty("user.dir")+ "\\solutions"+ path;
+		new File(output).mkdirs();
+        output =output +  "\\" + name;
+		StringBuilder builder = new StringBuilder();
+		for(int i = 0; i < n+1; i++)//for each row
+		{
+			if(i==n)
+				builder.append("Pinakas " +grid[i]);
+			else
+				builder.append(i + " " +grid[i]);//append to the output string
+		   builder.append("\n");//append new line at the end of the row
 		}
-		//compare by the first column (jaccard)
-		Arrays.sort(measures, (a, b) -> Double.compare(b[1], a[1]));
-		ExportMeasures("jaccard_users.txt",measures);
-		for(int j=measures.length-1;j>measures.length-1-k;j--) {
-			neighbors.add((int) measures[j][0]);
-		}	
-		neighbors.clear();
-		
-		//compare by the seconds column (cosine)
-		Arrays.sort(measures, (a, b) -> Double.compare(b[2], a[2]));
-		ExportMeasures("cosine_users.txt",measures);
-		for(int j=measures.length-1;j>measures.length-1-k;j--) {
-			neighbors.add((int) measures[j][0]);
-		}
-		neighbors.clear();
-		
-		//compare by the third column (pearson)
-		Arrays.sort(measures, (a, b) -> Double.compare(b[3], a[3]));
-		ExportMeasures("pearson_users.txt",measures);
-		for(int j=measures.length-1;j>measures.length-1-k;j--) {
-			neighbors.add((int) measures[j][0]);
+		BufferedWriter writer;
+		try {
+			writer = new BufferedWriter(new FileWriter(output));
+			writer.write(builder.toString());//save the string representation of the board
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
-	public void calculateMeasuresForItems(int k,int item) {
-		double[][] measures = new double[n][4];
-		int[][] transpose = transposeMatrix(table);
-		ArrayList<Integer> neighbors = new ArrayList<Integer>();
-		for(int i=0;i<table.length;i++) {
-			if(i!=item) {
-				double jaccard = new Jaccard(transpose[item],transpose[i]).calculateJaccardUser();
-				double cosine = new Cosine(transpose[item],transpose[i]).CalculateCosineSimilarity();
-				double pearson = new PearsonCorrelation(transpose[item],transpose[i]).CalculateCorrelation();
-				measures[i][0] = i;
-				measures[i][1] = jaccard;
-				measures[i][2] = cosine;
-				measures[i][3] = pearson;
+	public void calculateMeasuresForUsers(String method,int repetition) {
+		double predictedvalues[][] = new double[n][m];
+		double abs_error[] = new double[n+1];
+		Calculator calc = new Calculator();
+		
+		int[][] copied = new int[n][m];
+		for(int i=0;i<n;i++) {
+		 for(int j=0;j<m;j++) {
+		  copied[i][j] = table[i][j];
+		 }
+		}
+
+		for(int user=0;user<table.length;user++) {
+			double[][] measures = new double[n][2];
+			double predictedvalues_user[];
+			for(int i=0;i<table.length;i++) {
+				if(i!=user) {
+					measures[i][0] = i;
+					if(method=="jaccard")
+						measures[i][1] = calc.calculateJaccard(table[user],table[i]);
+					else if(method=="cosine") {
+						measures[i][1] = calc.CalculateCosineSimilarity(table[user],table[i]);
+					}
+					else if(method=="corr") {
+						measures[i][1] = calc.CalculateCorrelation(table[user],table[i]);
+					}
+				}
 			}
+			//compare by the first column (jaccard)
+			Arrays.sort(measures, (a, b) -> Double.compare(b[1], a[1]));
+			predictedvalues_user = predictValues(measures,user);
+			predictedvalues[user]=predictedvalues_user;
+			abs_error[user] = calc.meanAbsoluteError(table[user],predictedvalues_user);//meso apolito lathos ana xristi
+			FillEmpty(copied,user,predictedvalues_user);
 		}
-		//compare by the first column (jaccard)
-		Arrays.sort(measures, (a, b) -> Double.compare(b[1], a[1]));
-		ExportMeasures("jaccard_items.txt",measures);
-		for(int j=measures.length-1;j>measures.length-1-k;j--) {
-			neighbors.add((int) measures[j][0]);
-		}
-		neighbors.clear();
+		abs_error[n] = calc.tableMeanAbsoluteError(table,predictedvalues);
+		String outputpath = "\\repetition" + (repetition+1) + "\\user_user";
+		Export(outputpath ,copied, method + "_table.txt");
+		ExportErrors(outputpath,abs_error,method + "_abserrors.txt");
+	}
+	
+	public void calculateMeasuresForItems(String method,int repetition) {
+		double predictedvalues[][] = new double[n][m];
+		double abs_error[] = new double[n+1];
+		Calculator calc = new Calculator();
+		int[][] transpose = transposeMatrix(table);
 		
-		//compare by the seconds column (cosine)
-		Arrays.sort(measures, (a, b) -> Double.compare(b[2], a[2]));
-		ExportMeasures("cosine_item.txt",measures);
-		for(int j=measures.length-1;j>measures.length-1-k;j--) {
-			neighbors.add((int) measures[j][0]);
+		int[][] copied = new int[n][m];
+		for(int i=0;i<n;i++) {
+		 for(int j=0;j<m;j++) {
+		  copied[i][j] = transpose[i][j];
+		 }
 		}
-		neighbors.clear();
-		
-		//compare by the third column (pearson)
-		Arrays.sort(measures, (a, b) -> Double.compare(a[3], a[3]));
-		ExportMeasures("pearson_items.txt",measures);
-		for(int j=measures.length-1;j>measures.length-1-k;j--) {
-			neighbors.add((int) measures[j][0]);
+
+		for(int item=0;item<transpose.length;item++) {
+			double[][] measures = new double[n][2];
+			double predictedvalues_item[];
+			for(int i=0;i<transpose.length;i++) {
+				if(i!=item) {
+					measures[i][0] = i;
+					if(method=="jaccard")
+						measures[i][1] = calc.calculateJaccard(transpose[item],transpose[i]);
+					else if(method=="cosine") {
+						measures[i][1] = calc.CalculateCosineSimilarity(transpose[item],transpose[i]);
+					}
+					else if(method=="corr") {
+						measures[i][1] = calc.CalculateCorrelation(transpose[item],transpose[i]);
+					}
+				}
+			}
+			//compare by the first column (jaccard)
+			Arrays.sort(measures, (a, b) -> Double.compare(b[1], a[1]));
+			predictedvalues_item = predictValues(measures,item);
+			predictedvalues[item]=predictedvalues_item;
+			abs_error[item] = calc.meanAbsoluteError(transpose[item],predictedvalues_item);//meso apolito lathos/item
+			FillEmpty(copied,item,predictedvalues_item);
 		}
+		abs_error[n] = calc.tableMeanAbsoluteError(table,predictedvalues);
+		String outputpath = "\\repetition" + (repetition+1) + "\\item_item";
+		copied = transposeMatrix(copied);
+		Export(outputpath ,copied, method + "_table.txt");
+		ExportErrors(outputpath,abs_error,method + "_abserrors.txt");
 	}
 	
 	public static int[][] transposeMatrix(int [][] m){
@@ -189,5 +184,33 @@ public class Start {
                 temp[j][i] = m[i][j];
         return temp;
     }
+	
+	  public double[] predictValues(double[][] measures,int user) {
+		  double predictedvalues[] = new double[table[user].length];
+		  for(int j = 0; j < table[user].length; j++) {
+			  double predictedvalue=0;
+			  double denominator=0;
+				  for(int i=0;i<k;i++) {
+					  if(table[(int) measures[i][0]][j]!=0) {
+						  double value = table[(int) measures[i][0]][j]*measures[i][1];
+						  System.out.println("predicted value for (" +measures[i][0] +"," + j +") " +value+ " " + table[(int) measures[i][0]][j] + " " + measures[i][1]);
+						  predictedvalue += table[(int) measures[i][0]][j]*measures[i][1];
+						  denominator+= measures[i][1];
+					  }
+				  }
+			if (denominator!=0)
+				predictedvalue = predictedvalue/denominator;
+			predictedvalues[j] = predictedvalue;
+		  }		
+		  return  predictedvalues;
+	  }
+	  
+	  public void FillEmpty(int[][] copied, int user, double[] predvalues) { 
+		  for(int j=0;j<copied[user].length;j++) {
+			  if(copied[user][j]==0) {
+				  copied[user][j] = (int) Math.round(predvalues[j]);
+			  }
+		  }
+	  }
 	
 }

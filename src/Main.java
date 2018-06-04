@@ -10,7 +10,16 @@ public class Main {
 		// TODO Auto-generated method stub
 		String input = System.getProperty("user.dir")+ "\\"+ "configuration.txt";
 		Retrieve(input);
-		new Start(n,m,x,k,t);
+		for(int i=0;i<t;i++){
+			Start start =new Start(n,m,x,k);
+			start.Populate(i);
+			start.calculateMeasuresForUsers("jaccard",i);
+			start.calculateMeasuresForUsers("cosine",i);
+			start.calculateMeasuresForUsers("corr",i);
+			start.calculateMeasuresForItems("jaccard",i);
+			start.calculateMeasuresForItems("cosine",i);
+			start.calculateMeasuresForItems("corr",i);
+		}
 	}
 	
 	public static void Retrieve(String input) {
