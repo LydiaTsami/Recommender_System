@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -10,6 +11,8 @@ public class Main {
 		// TODO Auto-generated method stub
 		String input = System.getProperty("user.dir")+ "\\"+ "configuration.txt";
 		Retrieve(input);
+		File file =new File(System.getProperty("user.dir")+ "\\solutions");
+		deleteDir(file);
 		for(int i=0;i<t;i++){
 			Start start =new Start(n,m,x,k);
 			start.Populate(i);
@@ -39,6 +42,18 @@ public class Main {
 			System.out.println("Failed to read file");
 			i.printStackTrace();
 		}
+	}
+	
+	static void deleteDir(File file) {
+	    File[] contents = file.listFiles();
+	    if (contents != null) {
+	        for (File f : contents) {
+	            if (! Files.isSymbolicLink(f.toPath())) {
+	                deleteDir(f);
+	            }
+	        }
+	    }
+	    file.delete();
 	}
 
 }
