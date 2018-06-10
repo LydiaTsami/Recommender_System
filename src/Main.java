@@ -23,6 +23,12 @@ public class Main {
 			start.calculateMeasuresForItems("cosine",i);
 			start.calculateMeasuresForItems("corr",i);
 		}
+		System.out.println("Completed");
+		
+//		Start start =new Start(n,m,x,k);
+//		start.Import();
+//		start.calculateMeasuresForUsers("jaccard",1);
+		
 	}
 	
 	public static void Retrieve(String input) {

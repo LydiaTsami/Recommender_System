@@ -2,6 +2,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 
+import javax.sound.midi.Synthesizer;
+
 public class Calculator {
 	
 	public double calculateJaccard(int[] vector1,int[] vector2) {
@@ -27,7 +29,10 @@ public class Calculator {
 			if(vector2[i]!=0 && (!union.contains(vector2[i])))
 				union.add(vector2[i]);
 		}
-		double jaccard = intersection.size()/union.size();
+		double jaccard = (double)intersection.size()/union.size();
+		jaccard = BigDecimal.valueOf(jaccard)
+			    .setScale(3, RoundingMode.HALF_UP)
+			    .doubleValue();
 		return jaccard;
 	}
 	
@@ -93,6 +98,7 @@ public class Calculator {
 		    return pearson;
 		  }
 	  
+	  //Calculates the mean of absolute errors between 2 1-dimensional grids.
 	  public double meanAbsoluteError(int[] realV, double[] predictedV) {
 			int count = 0;
 			double sum=0;
@@ -100,13 +106,11 @@ public class Calculator {
 			for(int i=0; i<realV.length; i++) { 
 				if(realV[i] !=0 && predictedV[i] !=0) {
 					sum += Math.abs(realV[i] - predictedV[i]);
-					System.out.println(realV[i] + " " + predictedV[i]+"     "+ sum);
 					count++;
 				}
 			}
 			
 			double result = sum/count;
-			System.out.println(sum+ " " + count+ " " +result);
 			if(sum!=0)
 				result = BigDecimal.valueOf(result)
 					.setScale(3, RoundingMode.HALF_UP)
@@ -114,6 +118,7 @@ public class Calculator {
 			return result;
 		}
 	  
+	  //Calculates table's Absolute Error
 	  public double tableMeanAbsoluteError(int table[][],double predicted[][]) {
 			int count = 0;
 			double sum=0;
